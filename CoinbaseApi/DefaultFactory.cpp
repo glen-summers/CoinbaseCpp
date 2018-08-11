@@ -34,7 +34,5 @@ DefaultFactory::DefaultFactory(const std::string& streamUrl, const std::string& 
 
 Coinbase::StreamPtr DefaultFactory::CreateStream(Coinbase::StreamCallbacks&) const
 {
-	//Stream s;
-	//return (Coinbase::StreamPtr)std::make_unique<WebsocketStream>();
-	return std::unique_ptr<Stream>(new WebsocketStream());
+	return std::make_unique<WebsocketStream>(streamUrl);
 }

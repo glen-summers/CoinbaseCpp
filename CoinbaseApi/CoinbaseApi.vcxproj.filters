@@ -47,5 +47,13 @@
     <ClCompile Include="DefaultFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WebSocketStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Default.props">
+      <Filter>interface</Filter>
+    </None>
   </ItemGroup>
 </Project>

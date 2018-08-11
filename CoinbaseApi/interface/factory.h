@@ -5,6 +5,9 @@
 
 #include <memory>
 
+#pragma comment(lib, "libssl.lib")
+#pragma comment(lib, "libcrypto.lib")
+
 namespace Coinbase
 {
 	typedef std::unique_ptr<Stream> StreamPtr;
