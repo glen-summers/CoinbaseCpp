@@ -2,21 +2,39 @@
 
 #include "interface/stream.h"
 
-#include <boost/system/config.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
-#include <boost/beast/websocket/ssl.hpp>
-#include <boost/asio/connect.hpp>
+#include <boost/beast/websocket/ssl.hpp> // omision causes Unknown Socket type in async_teardown.
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
 
 #include <string>
 
-class WebsocketStream final : public Coinbase::Stream
+class WebsocketStream final
+	: public std::enable_shared_from_this<WebsocketStream>
+	, public Coinbase::Stream
 {
-	std::string const url;
+	using tcp = boost::asio::ip::tcp;
+	using WebSocket = boost::beast::websocket::stream<boost::asio::ssl::stream<tcp::socket>>;
+	using Buffer = boost::beast::multi_buffer;
+
+	std::string const host;
+	std::string const port = "443";
+
+	tcp::resolver resolver;
+	WebSocket webSocket;
+	Buffer buffer;
 
 public:
 	WebsocketStream(const std::string & url);
-	~WebsocketStream() = default;
+	~WebsocketStream() // = default;
+	{
+		std::cout << "~WebsocketStream" << std::endl;
+	}
+	
+	void Start();
+
+private:
+	void Read();
+	void Fail(boost::system::error_code ec, char const* what);
 };

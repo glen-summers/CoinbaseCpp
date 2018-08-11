@@ -7,21 +7,22 @@ using Coinbase::DefaultFactory;
 
 namespace
 {
-	const char StreamUrl[] = "wss://ws-feed.pro.coinbase.com";
-	const char RequestUrl[] = "https://api.pro.coinbase.com";
+	const char StreamHost[] = "ws-feed.pro.coinbase.com";
+	const char RequestHost[] = "api.pro.coinbase.com";
 
-	const char SandboxStreamUrl[] = "wss://ws-feed-public.sandbox.gdax.com";
-	const char SandboxRequestUrl[] = "https://api-public.sandbox.gdax.com";
+	const char SandboxStreamHost[] = "ws-feed-public.sandbox.pro.coinbase.com";
+	const char SandboxRequestHost[] = "api-public.sandbox.pro.coinbase.com";
 
-	// not working yet..
-	//const char SandboxStreamUrl[] = "wss://ws-feed-public.sandbox.pro.coinbase.com";
-	//const char SandboxRequestUrl[] = "https://api-public.sandbox.pro.coinbase.com";
-
-	//DefaultFactory liveFactory(StreamUrl, RequestUrl);
-	DefaultFactory sandboxFactory(SandboxStreamUrl, SandboxRequestUrl);
+	DefaultFactory liveFactory(StreamHost, RequestHost);
+	DefaultFactory sandboxFactory(SandboxStreamHost, SandboxRequestHost);
 }
 
 const Coinbase::Factory& Coinbase::Factory::Create()
+{
+	return liveFactory;
+}
+
+const Coinbase::Factory& Coinbase::Factory::CreateSandbox()
 {
 	return sandboxFactory;
 }
@@ -34,5 +35,5 @@ DefaultFactory::DefaultFactory(const std::string& streamUrl, const std::string& 
 
 Coinbase::StreamPtr DefaultFactory::CreateStream(Coinbase::StreamCallbacks&) const
 {
-	return std::make_unique<WebsocketStream>(streamUrl);
+	return std::make_shared<WebsocketStream>(streamUrl);
 }

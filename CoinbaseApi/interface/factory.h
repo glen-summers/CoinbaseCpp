@@ -10,7 +10,7 @@
 
 namespace Coinbase
 {
-	typedef std::unique_ptr<Stream> StreamPtr;
+	typedef std::shared_ptr<Stream> StreamPtr;
 
 	struct Factory
 	{
@@ -18,5 +18,6 @@ namespace Coinbase
 		virtual ~Factory() = default;
 
 		static const Factory& Create();
+		static const Factory& CreateSandbox();
 	};
 }

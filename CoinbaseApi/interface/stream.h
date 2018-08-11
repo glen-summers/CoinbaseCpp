@@ -4,8 +4,11 @@ namespace Coinbase
 {
 	struct Stream
 	{
+		virtual void Start() = 0;
 		//        virtual void Subscribe(const Subscription & subscription) = 0;
 		//        virtual void Unsubscribe(const Subscription & subscription) = 0;
-		virtual ~Stream() = 0 {} // https://eli.thegreenplace.net/2010/11/13/pure-virtual-destructors-in-c
+
+		// not rerally needed as shared_ptr magic will call derived dtor
+		virtual ~Stream() = default;
 	};
 }
