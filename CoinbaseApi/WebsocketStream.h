@@ -27,12 +27,10 @@ class WebsocketStream final
 
 public:
 	WebsocketStream(const std::string & url);
-	~WebsocketStream() // = default;
-	{
-		std::cout << "~WebsocketStream" << std::endl;
-	}
-	
-	void Start();
+	~WebsocketStream(); // = default;
+
+	void Start() override;
+	void Stop() override;
 
 private:
 	void Read();

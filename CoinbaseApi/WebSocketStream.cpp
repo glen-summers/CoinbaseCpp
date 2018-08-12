@@ -18,11 +18,17 @@ WebsocketStream::WebsocketStream(const std::string& url)
 	std::cout << "WebsocketStream" << std::endl;
 }
 
+WebsocketStream::~WebsocketStream()
+{
+	std::cout << "~WebsocketStream" << std::endl;
+}
+
 void WebsocketStream::Start()
 {
 	std::cout << "Start" << std::endl;
 
 	auto self(shared_from_this());
+	//ioContext.post([this, self]() {
 	resolver.async_resolve(host, port, [this, self](boost::system::error_code ec, tcp::resolver::results_type results)
 	{
 		if (ec) return Fail(ec, "resolve");
@@ -64,9 +70,18 @@ void WebsocketStream::Start()
 			});
 		});
 	});
+	//});
 
 	// run sync here, move to where?
 	ioContext.run();
+	//boost::asio::dispatch();
+}
+
+void WebsocketStream::Stop()
+{
+	// need to cancel async read?
+	std::cout << "stop" << std::endl;
+	ioContext.stop();
 }
 
 void WebsocketStream::Read()
@@ -74,10 +89,8 @@ void WebsocketStream::Read()
 	auto self(shared_from_this());
 	webSocket.async_read(buffer, [this, self](boost::system::error_code ec, std::size_t bytes_transferred)
 	{
-	 	UNREFERENCED_PARAMETER(bytes_transferred);
+		std::cout << "read " << bytes_transferred << " : " << buffers(buffer.data()) << std::endl;
 	 	if (ec) return Fail(ec, "read");
-
-		std::cout << buffers(buffer.data()) << std::endl;
 
 		buffer = boost::beast::multi_buffer {};
 		Read(); // how stop read loop?
