@@ -19,20 +19,27 @@ class WebsocketStream final
 	using Buffer = boost::beast::multi_buffer;
 
 	std::string const host;
-	std::string const port = "443";
+	short port;
+
+	std::string const proxyHost;
+	short proxyPort;
 
 	tcp::resolver resolver;
 	WebSocket webSocket;
 	Buffer buffer;
 
 public:
-	WebsocketStream(const std::string & url);
+	WebsocketStream(const std::string & host, short port);
+	WebsocketStream(const std::string & host, short port, const std::string & proxyHost, short proxyPort);
 	~WebsocketStream(); // = default;
 
 	void Start() override;
 	void Stop() override;
 
 private:
+	void Connect();
+	void ConnectProxy();
+	void CompleteHandshake();
 	void Read();
 	void Fail(boost::system::error_code ec, char const* what);
 };
