@@ -7,7 +7,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>
 				$(MSBuildThisFileDirectory)..\BoostBuildExamples\BoostBeastBuildTest\tmp\boost_1_67_0;
-				$(MSBuildThisFileDirectory)..\BoostBuildExamples\BoostBeastBuildTest\tmp\openssl\include
+				$(MSBuildThisFileDirectory)..\BoostBuildExamples\BoostBeastBuildTest\tmp\openssl\include;
+				$(MSBuildThisFileDirectory)Dependencies\rapidjson\include
 			</AdditionalIncludeDirectories>
 			<PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX;WIN32_LEAN_AND_MEAN;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <TreatWarningAsError Condition="'$(Configuration)'=='Debug'">false</TreatWarningAsError>

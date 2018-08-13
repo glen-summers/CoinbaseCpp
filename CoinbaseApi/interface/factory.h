@@ -15,7 +15,7 @@ namespace Coinbase
 	struct Factory
 	{
 		virtual StreamPtr CreateStream(StreamCallbacks &) const = 0;// , const Subscription &, Auth * auth = nullptr) const = 0;
-		virtual StreamPtr CreateStreamWithProxy(const std::string& proxyServer, short proxyPort, StreamCallbacks &) const = 0;
+		virtual StreamPtr CreateStreamWithProxy(const std::string& proxyServer, unsigned short proxyPort, StreamCallbacks &) const = 0;
 		virtual ~Factory() = default;
 
 		static const Factory& Create();

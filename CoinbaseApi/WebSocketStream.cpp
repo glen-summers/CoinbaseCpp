@@ -13,17 +13,25 @@ namespace
 	ssl::context sslContext { ssl::context::sslv23_client };
 }
 
-WebsocketStream::WebsocketStream(const std::string & host, short port)
-	: WebsocketStream(host, port, {}, {})
-{}
+WebsocketStream::FunctionMap WebsocketStream::functionMap =
+{
+	{ "subscriptions", &WebsocketStream::ProcessSubscriptions },
+	{ "snapshot", &WebsocketStream::ProcessSnapshot },
+	{ "l2update", &WebsocketStream::ProcessUpdate },
+	{ "heartbeat", &WebsocketStream::ProcessHeartbeat },
+	{ "ticker", &WebsocketStream::ProcessTicker },
+	{ "error", &WebsocketStream::ProcessError },
+};
 
-WebsocketStream::WebsocketStream(const std::string & host, short port, const std::string & proxyHost, short proxyPort)
+WebsocketStream::WebsocketStream(const std::string & host, unsigned short port, const std::string & proxyHost, unsigned short proxyPort,
+	Coinbase::StreamCallbacks & callback)
 	: host(host)
 	, port(port)
 	, proxyHost(proxyHost)
 	, proxyPort(proxyPort)
 	, resolver(ioContext)
 	, webSocket(ioContext, sslContext)
+	, callback(callback)
 {
 	std::cout << "WebsocketStream with proxy" << std::endl;
 }
@@ -120,14 +128,12 @@ void WebsocketStream::CompleteHandshake()
 			if (ec) return Fail(ec, "handshake");
 			std::cout << "handshake" << std::endl;
 
+			// without heartbeat get stream_truncated error on sandbox endpoint, something to do with inactivity
+			// not seen on live endpoint but unlikly to ever have inactivity, try just an user order update subscription with no orders on live?
 			std::string subscription = R"({
     "type": "subscribe",
-    "product_ids": [
-        "BTC-EUR"
-    ],
-    "channels": [
-        "level2"
-    ]
+    "product_ids": ["BTC-EUR"],
+    "channels": [ "level2", "heartbeat", "ticker" ]
 })";
 
 			webSocket.async_write(boost::asio::buffer(subscription), [this, self](boost::system::error_code ec, std::size_t bytes_transferred)
@@ -153,18 +159,74 @@ void WebsocketStream::Read()
 	auto self(shared_from_this());
 	webSocket.async_read(buffer, [this, self](boost::system::error_code ec, std::size_t bytes_transferred)
 	{
-		std::cout << "read " << bytes_transferred << " : " << buffers(buffer.data()) << std::endl;
-	 	if (ec) return Fail(ec, "read");
+		UNREFERENCED_PARAMETER(bytes_transferred);
+		if (ec) return Fail(ec, "read");
+		std::ostringstream stm;
+		stm << buffers(buffer.data());
+
+		JsonDocument document;
+		document.Parse(stm.str().c_str());
+
+		auto type = document["type"].GetString();
+		auto it = functionMap.find(type);
+		if (it != functionMap.end())
+		{
+			//std::invoke(it->second, *this, document);
+			(this->*(it->second))(document);
+		}
+		else
+		{
+			std::cout << "Unprocessed message: " << type << std::endl;
+		}
 
 		buffer = boost::beast::multi_buffer {};
-		Read(); // how stop read loop?
+		Read();
 	});
 }
 
 void WebsocketStream::Fail(boost::system::error_code ec, char const* what)
 {
-	std::cerr << what
-		<< " : " << ec.message()
-		<< " : " << ec.category().name() << "\n";
-	// call error callback
+	std::ostringstream stm;
+	stm << what << " : " << ec.message() << " : " << ec.category().name();
+	callback.OnError(stm.str());
+}
+
+void WebsocketStream::ProcessSubscriptions(const JsonDocument & document)
+{
+	UNREFERENCED_PARAMETER(document);
+	std::cout << "sub response" << std::endl;
+}
+
+void WebsocketStream::ProcessError(const JsonDocument & document)
+{
+	// error from malformed json or server error
+	// will be on an io thread, so cannot throw, notify on interface, receiver should resubscribe
+	// get some "unable to establish level 2 for ..." but other channels are ticking
+	// should treat all errors as fatal and require a resubscribe
+	// log error here
+	callback.OnError(document["message"].GetString());
+}
+
+void WebsocketStream::ProcessSnapshot(const JsonDocument & document)
+{
+	UNREFERENCED_PARAMETER(document);
+	std::cout << "snap" << std::endl;
+}
+
+void WebsocketStream::ProcessUpdate(const JsonDocument & document)
+{
+	UNREFERENCED_PARAMETER(document);
+	std::cout << "update" << std::endl;
+}
+
+void WebsocketStream::ProcessHeartbeat(const JsonDocument & document)
+{
+	UNREFERENCED_PARAMETER(document);
+	std::cout << "hb" << std::endl;
+}
+
+void WebsocketStream::ProcessTicker(const JsonDocument & document)
+{
+	UNREFERENCED_PARAMETER(document);
+	std::cout << "tick" << std::endl;
 }
