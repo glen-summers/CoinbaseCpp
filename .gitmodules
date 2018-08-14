@@ -2,3 +2,4 @@
 	path = Dependencies/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
 	branch = version1.1.0
+	shallow = true
