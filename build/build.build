@@ -1,0 +1,66 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+	<PropertyGroup>
+		<Root>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)\..'))</Root>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Solution>Coinbase.sln</Solution>
+		<Source>$(Root)</Source>
+		<MajorVersion>1</MajorVersion>
+		<MinorVersion>0</MinorVersion>
+		<FileBuildNumber>0</FileBuildNumber>
+		<Configuration>Release</Configuration>
+		<Platform>x64</Platform>
+		<BuildInParallel>true</BuildInParallel>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Out>$(Root)\out</Out>
+		<PlatformOut>$(Out)\$(Platform)</PlatformOut>
+		<Temp>$(PlatformOut)\temp</Temp>
+		<OutputPath>$(PlatformOut)\$(Configuration)</OutputPath>
+	</PropertyGroup>
+
+	<Target Name="MakeTempDir">
+		<MakeDir Directories="$(Temp)"/>
+	</Target>
+
+	<Target Name="Clean">
+		<ItemGroup>
+			<FileToDelete Include="$(Out)/**/*"/>
+			<FileToDelete Include="$(Source)/**/Debug/**/*"/>
+			<FileToDelete Include="$(Source)/**/Release/**/*"/>
+			<FileToDelete Include="$(Source)/**/ipch/**/*"/>
+			<FileToDelete Include="$(Source)/lib/*"/>
+		</ItemGroup>
+		<Delete Files="@(FileToDelete)" ContinueOnError="WarnAndContinue"/>
+
+		<ItemGroup>
+			<DirectoriesToRemove Include="$(Out)"/>
+			<DirectoriesToRemove Include="$(Cpp)/Debug"/>
+			<DirectoriesToRemove Include="$(Cpp)/Release"/>
+			<DirectoriesToRemove Include="$(Cpp)/x64"/>
+		</ItemGroup>
+		<RemoveDir Directories="@(DirectoriesToRemove)"/>
+	</Target>
+
+	<Target Name="Restore"/>
+
+	<Target Name="Compile" DependsOnTargets="Restore">
+		<ItemGroup>
+			<Properties Remove="@(Properties)"/>
+			<Properties Include="Configuration=$(Configuration)"/>
+			<Properties Include="OutDir=$(OutputPath)\"/>
+			<Properties Include="Platform=$(Platform)"/>
+			<Properties Include="@(CustomProperties)"/>
+		</ItemGroup>
+		<MSBuild Projects="$(Source)\$(Solution)" Properties="@(Properties)" BuildInParallel="$(BuildInParallel)"/>
+	</Target>
+
+	<Target Name="CompileX86">
+		<MSBuild Condition="'$(Platform)'!='x86'" Projects="$(MSBuildProjectFile)" Targets="Compile" Properties="Platform=x86"/>
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="Compile"/>
+
+</Project>
