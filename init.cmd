@@ -1,7 +1,7 @@
 :: init sparse checkout
 :: one way I found to get sparse submodule checkout to work is to [init, update, deinit], this leaves the module config in .git\modules\... then inject the sparse config and rerun [init, update]
 :: an alternative is to update --init with a bogus cmd this creates the .git module info but no update, then set the sparse data and then do a real update
-::@echo off
+@echo off
 setlocal
 cd %~dp0
 
