@@ -4,10 +4,14 @@
 @echo off
 setlocal
 cd %~dp0
+git submodule deinit --all -f || (echo submodule deinit failed & exit /b 1)
+:: sometimes get - Could not remove submodule work tree 'Dependencies/rapidjson'
+::could not create empty submodule directory Dependencies/rapidjsonSubmodule 'Dependencies/rapidjson' (https://github.com/Tencent/rapidjson.git) unregistered for path 'Dependencies/rapidjson'
 
-git -c submodule.Dependencies/rapidjson.update=^!echo submodule update --init || (echo submodule update failed & exit /b 1)
+git submodule init || (echo submodule init failed & exit /b 1)
+git -c submodule.Dependencies/rapidjson.update=^!echo submodule update || (echo submodule update failed & exit /b 1)
 git -C .git\modules\Dependencies\rapidjson config core.sparsecheckout true || (echo config sparse failed & exit /b 1)
 echo include > .git\modules\Dependencies\rapidjson\info\sparse-checkout || (echo sparse write failed & exit /b 1)
-git submodule update --init || (echo submodule update failed & exit /b 1)
+git submodule update -f || (echo submodule update failed & exit /b 1)
 
 exit /b 0
