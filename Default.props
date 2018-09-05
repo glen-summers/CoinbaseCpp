@@ -2,15 +2,20 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup>
+    <BoostVer>boost_1_68_0</BoostVer>
+    <OpenSsl>openssl-1.1.0i</OpenSsl>
+    <Boost>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), ExternalDependencies\$(BoostVer)\Jamroot))\ExternalDependencies\$(BoostVer)</Boost>
+    <OpenSsl>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), ExternalDependencies\$(OpenSsl)\include\openssl\opensslconf.h))\ExternalDependencies\$(OpenSsl)</OpenSsl>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>
-				$(MSBuildThisFileDirectory)..\BoostBuildExamples\BoostBeastBuildTest\tmp\boost_1_67_0;
-				$(MSBuildThisFileDirectory)..\BoostBuildExamples\BoostBeastBuildTest\tmp\openssl\include;
-				$(MSBuildThisFileDirectory)Dependencies\rapidjson\include
-			</AdditionalIncludeDirectories>
-			<PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX;WIN32_LEAN_AND_MEAN;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+        $(Boost);
+        $(OpenSsl)\include;
+        $(MSBuildThisFileDirectory)\Dependencies\rapidjson\include;
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX;WIN32_LEAN_AND_MEAN;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <TreatWarningAsError Condition="'$(Configuration)'=='Debug'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)'!='Debug'">true</TreatWarningAsError>
       <WarningLevel>Level4</WarningLevel>
@@ -22,8 +27,8 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
-        $(MSBuildThisFileDirectory)..\BoostBuildExamples\BoostBeastBuildTest\tmp\boost_1_67_0\stage\lib;
-        $(MSBuildThisFileDirectory)..\BoostBuildExamples\BoostBeastBuildTest\tmp\openssl\lib
+        $(Boost)\stage\lib;
+        $(OpenSsl)\lib;
       </AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
