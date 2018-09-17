@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "Heartbeat.h"
 #include "WebsocketStream.h"
 
 #include <boost/asio/connect.hpp>
@@ -221,8 +222,9 @@ void WebsocketStream::ProcessUpdate(const JsonDocument & document)
 
 void WebsocketStream::ProcessHeartbeat(const JsonDocument & document)
 {
-	UNREFERENCED_PARAMETER(document);
-	std::cout << "hb" << std::endl;
+	auto hb = Heartbeat::Parse(document);
+
+	std::cout << "hb: id=" << hb.Id() << ", Seq=" << hb.Seq() << std::endl;
 }
 
 void WebsocketStream::ProcessTicker(const JsonDocument & document)

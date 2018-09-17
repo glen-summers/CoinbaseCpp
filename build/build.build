@@ -12,6 +12,7 @@
 		<Configuration>Release</Configuration>
 		<Platform>x64</Platform>
 		<BuildInParallel>true</BuildInParallel>
+		<TestProject>Tests</TestProject>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -19,6 +20,9 @@
 		<PlatformOut>$(Out)\$(Platform)</PlatformOut>
 		<Temp>$(PlatformOut)\temp</Temp>
 		<OutputPath>$(PlatformOut)\$(Configuration)</OutputPath>
+
+		<TestExecutable>$(OutputPath)\$(TestProject).exe</TestExecutable>
+
 	</PropertyGroup>
 
 	<Target Name="MakeTempDir">
@@ -56,11 +60,15 @@
 		</ItemGroup>
 		<MSBuild Projects="$(Source)\$(Solution)" Properties="@(Properties)" BuildInParallel="$(BuildInParallel)"/>
 	</Target>
-
+	
+	<!--32bit...
 	<Target Name="CompileX86">
 		<MSBuild Condition="'$(Platform)'!='x86'" Projects="$(MSBuildProjectFile)" Targets="Compile" Properties="Platform=x86"/>
+	</Target>-->
+
+	<Target Name="Test" DependsOnTargets="Compile">
+		<Exec command="$(TestExecutable)"/>
 	</Target>
 
-	<Target Name="Build" DependsOnTargets="Compile"/>
-
+	<Target Name="Build" DependsOnTargets="Compile;Test"/>
 </Project>
