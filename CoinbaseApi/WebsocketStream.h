@@ -3,6 +3,8 @@
 #include "interface/stream.h"
 #include "interface/streamcallbacks.h"
 
+#include <GLib/flogging.h>
+
 #include <rapidjson/document.h>
 
 #include <boost/beast/core.hpp>
@@ -18,6 +20,8 @@ class WebsocketStream final
 	: public std::enable_shared_from_this<WebsocketStream>
 	, public Coinbase::Stream
 {
+	inline static const GLib::Flog::Log log = GLib::Flog::LogManager::GetLog<WebsocketStream>();
+
 	using tcp = boost::asio::ip::tcp;
 	using WebSocket = boost::beast::websocket::stream<boost::asio::ssl::stream<tcp::socket>>;
 	using Buffer = boost::beast::multi_buffer;
@@ -42,7 +46,6 @@ class WebsocketStream final
 public:
 	WebsocketStream(const std::string & host, unsigned short port, const std::string & proxyHost, unsigned short proxyPort,
 		Coinbase::StreamCallbacks & callback);
-	~WebsocketStream(); // = default;
 
 	void Start() override;
 	void Stop() override;

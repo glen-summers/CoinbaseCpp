@@ -7,6 +7,7 @@
     <OpenSsl>openssl-1.1.0i</OpenSsl>
     <Boost>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), ExternalDependencies\$(BoostVer)\Jamroot))\ExternalDependencies\$(BoostVer)</Boost>
     <OpenSsl>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), ExternalDependencies\$(OpenSsl)\include\openssl\opensslconf.h))\ExternalDependencies\$(OpenSsl)</OpenSsl>
+    <GLib>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), GLib\include\GLib\flogging.h))\GLib\include</GLib>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -14,6 +15,7 @@
         $(Boost);
         $(OpenSsl)\include;
         $(MSBuildThisFileDirectory)\Dependencies\rapidjson\include;
+        $(GLib);
       </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX;WIN32_LEAN_AND_MEAN;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <TreatWarningAsError Condition="'$(Configuration)'=='Debug'">false</TreatWarningAsError>
