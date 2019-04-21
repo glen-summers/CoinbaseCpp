@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <BoostVer>boost_1_68_0</BoostVer>
+    <BoostVer>boost_1_69_0</BoostVer>
     <OpenSsl>openssl-1.1.0i</OpenSsl>
     <Boost>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), ExternalDependencies\$(BoostVer)\Jamroot))\ExternalDependencies\$(BoostVer)</Boost>
     <OpenSsl>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), ExternalDependencies\$(OpenSsl)\include\openssl\opensslconf.h))\ExternalDependencies\$(OpenSsl)</OpenSsl>

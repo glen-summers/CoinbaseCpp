@@ -1,17 +1,21 @@
-@echo off
-setlocal
+@echo off & cls & setlocal
 
+set vsVersion=(16^^^^,17]
 set buildFile=%~dp0Build\build.build
-set msbuildVersion=15.0
 
-set vswherecmd="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
-for /F "tokens=* usebackq" %%i in (`%vswherecmd%`) do set vsInstallationPath=%%i
-if "%vsInstallationPath%" equ "" echo Visual studio not found & goto :eof
+set requires=Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+set vsWhereBaseCmd="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -version %vsVersion% -requires %requires% 
 
-set msb="%vsInstallationPath%\MSBuild\%msbuildVersion%\Bin\MSBuild.exe"
-if not exist %msb% echo MSBuild not found at %msb% & goto :eof
+for /F "tokens=* usebackq delims=" %%i in (`%vsWhereBaseCmd% -property installationPath`) do set vsInstallationPath=%%i
+if "%vsInstallationPath%" equ "" echo Visual studio not found & exit /b 1
+echo vsInstallationPath=%vsInstallationPath%
+
+for /F "tokens=* usebackq delims=" %%i in (`%vsWhereBaseCmd% -find MSBuild\**\Bin\amd64\MSBuild.exe`) do set msbuild=%%i
+if "%msbuild%" equ "" echo msbuild not found & exit /b 1
+echo msbuild=%msbuild%
 
 set args=%*
 if "%1" NEQ "" set args=/t:%*
 
-%msb% /p:vsInstallationPath="%vsInstallationPath%" %buildFile% %args%
+call "%vsInstallationPath%\VC\Auxiliary\Build\vcvars64.bat"
+"%msbuild%" /p:vsInstallationPath="%vsInstallationPath%" %buildFile% %args%
